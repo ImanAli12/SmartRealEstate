@@ -1,0 +1,26 @@
+@model RealEstateWebApp.ViewModels.PropertyUpsertViewModel
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "تعديل العقار";
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+}
+
+<h1 class="h3 mb-4">تعديل العقار</h1>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="card p-4">
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    @await Html.PartialAsync("_PropertyForm", Model)
+    <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/property-form.js" asp-append-version="true"></script>
+    @if (!string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        <script src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&callback=initPropertyGoogleMap" async defer></script>
+    }
+}

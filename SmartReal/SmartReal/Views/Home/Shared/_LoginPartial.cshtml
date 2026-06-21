@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using RealEstateWebApp.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <a class="nav-link btn btn-outline-light btn-sm me-2 px-3" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">مرحباً @User.Identity?.Name</a>
+    </li>
+    <li class="nav-item">
+        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="nav-link btn btn-warning btn-sm px-3">تسجيل الخروج</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link btn btn-outline-light btn-sm me-2 px-3" asp-area="Identity" asp-page="/Account/Register">إنشاء حساب</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link btn btn-primary btn-sm px-3" asp-area="Identity" asp-page="/Account/Login">دخول</a>
+    </li>
+}
+</ul>

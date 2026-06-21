@@ -1,0 +1,21 @@
+@model RealEstateWebApp.Models.City
+@{
+    ViewData["Title"] = "تعديل مدينة";
+}
+
+<h1 class="h4 mb-3">تعديل مدينة</h1>
+
+<form asp-action="Edit" method="post" class="card p-3">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="NameAr" class="form-label"></label>
+        <input asp-for="NameAr" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="NameEn" class="form-label"></label>
+        <input asp-for="NameEn" class="form-control" />
+    </div>
+    <button class="btn btn-primary" type="submit">حفظ</button>
+</form>

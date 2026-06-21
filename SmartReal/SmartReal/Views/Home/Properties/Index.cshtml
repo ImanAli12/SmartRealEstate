@@ -1,0 +1,139 @@
+@model RealEstateWebApp.ViewModels.PropertySearchViewModel
+@{
+    ViewData["Title"] = "البحث الذكي عن العقارات";
+}
+
+<h1 class="h3 mb-2">البحث الذكي عن العقارات</h1>
+<p class="text-muted mb-4">أدخل المواصفات المطلوبة وسنرتّب لك أقرب 10 عقارات باستخدام K-Means مع نفس حقول ملف البيانات.</p>
+
+<form asp-action="Search" method="get" class="card p-4 mb-4">
+    <h2 class="h5 mb-3">مواصفات العقار المطلوبة</h2>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">السعر المطلوب</label>
+            <input asp-for="TargetPrice" class="form-control" placeholder="مثال: 78000" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">المساحة المطلوبة</label>
+            <input asp-for="TargetArea" class="form-control" placeholder="مثال: 120" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">عدد الغرف</label>
+            <input asp-for="TargetRooms" class="form-control" type="number" min="0" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">عدد الحمامات</label>
+            <input asp-for="TargetBathrooms" class="form-control" type="number" min="0" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">الطابق</label>
+            <input asp-for="TargetFloor" class="form-control" type="number" min="0" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">المدينة</label>
+            <select asp-for="TargetCityId" asp-items="Model.Cities" class="form-select" id="TargetCityId">
+                <option value="">كل المدن</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">الحي</label>
+            <select asp-for="TargetNeighborhoodId" asp-items="Model.Neighborhoods" class="form-select" id="TargetNeighborhoodId">
+                <option value="">كل الأحياء</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">نوع العقار</label>
+            <select asp-for="TargetPropertyTypeId" asp-items="Model.PropertyTypes" class="form-select">
+                <option value="">كل الأنواع</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">الحالة</label>
+            <select asp-for="TargetStatus" class="form-select">
+                <option value="">كل الحالات</option>
+                <option value="للبيع">للبيع</option>
+                <option value="للإيجار">للإيجار</option>
+            </select>
+        </div>
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div class="small text-muted">ستظهر لك أقرب 10 عقارات مطابقة قدر الإمكان للمواصفات المدخلة.</div>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> بحث ذكي</button>
+        </div>
+    </div>
+</form>
+
+@if (Model.RecommendationMode)
+{
+    <div class="alert alert-info border-0">تم ترتيب النتائج باستخدام K-Means وفق المواصفات المدخلة.</div>
+}
+
+<div class="row g-3">
+    @if (Model.RecommendationMode)
+    {
+        if (!Model.Recommendations.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-light border">لا توجد نتائج مطابقة للمواصفات المدخلة.</div>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.Recommendations)
+            {
+                var viewData = new ViewDataDictionary(ViewData)
+                {
+                    ["RecommendationScore"] = item.SimilarityScore
+                };
+
+                @await Html.PartialAsync("_PropertyCard", item.Property, viewData)
+            }
+        }
+    }
+    else if (!Model.Results.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-light border">لا توجد نتائج مطابقة للفلاتر الحالية.</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var property in Model.Results)
+        {
+            @await Html.PartialAsync("_PropertyCard", property)
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const citySelect = document.getElementById('TargetCityId');
+            const neighborhoodSelect = document.getElementById('TargetNeighborhoodId');
+            if (!citySelect || !neighborhoodSelect) {
+                return;
+            }
+
+            async function loadNeighborhoods(cityId) {
+                neighborhoodSelect.innerHTML = '<option value="">كل الأحياء</option>';
+                if (!cityId) {
+                    return;
+                }
+
+                const response = await fetch('/Properties/GetNeighborhoods?cityId=' + encodeURIComponent(cityId));
+                if (!response.ok) {
+                    return;
+                }
+
+                const items = await response.json();
+                for (const item of items) {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.nameAr;
+                    neighborhoodSelect.appendChild(option);
+                }
+            }
+
+            citySelect.addEventListener('change', () => loadNeighborhoods(citySelect.value));
+        })();
+    </script>
+}

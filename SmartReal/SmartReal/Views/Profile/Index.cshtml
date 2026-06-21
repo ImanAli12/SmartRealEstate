@@ -1,0 +1,92 @@
+@{
+    ViewData["Title"] = "حسابي";
+    var myProperties = ViewBag.MyProperties as List<RealEstateWebApp.Models.Property> ?? new();
+    var myFavorites = ViewBag.MyFavorites as List<RealEstateWebApp.Models.Favorite> ?? new();
+    var recommended = ViewBag.RecommendedProperties as List<RealEstateWebApp.Models.Property> ?? new();
+}
+
+<h1 class="h3 mb-4">لوحة المستخدم</h1>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="h5 mb-0">عقاراتي</h2>
+                <a asp-controller="Properties" asp-action="Create" class="btn btn-sm btn-primary">إضافة عقار</a>
+            </div>
+            @if (!myProperties.Any())
+            {
+                <div class="alert alert-light border mb-0">لا توجد عقارات مضافة بعد.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead><tr><th>العنوان</th><th>المدينة</th><th>السعر</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var property in myProperties)
+                        {
+                            <tr>
+                                <td>@property.Title</td>
+                                <td>@property.City?.NameAr</td>
+                                <td>@property.Price.ToString("N0") @property.PriceCurrency</td>
+                                <td class="text-nowrap">
+                                    <a asp-controller="Properties" asp-action="Edit" asp-route-id="@property.Id" class="btn btn-sm btn-outline-primary">تعديل</a>
+                                    <a asp-controller="Properties" asp-action="Delete" asp-route-id="@property.Id" class="btn btn-sm btn-outline-danger">حذف</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card p-3 mb-3">
+            <h2 class="h5">المفضلة</h2>
+            @if (!myFavorites.Any())
+            {
+                <div class="alert alert-light border mb-0">لا توجد عناصر مفضلة.</div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var favorite in myFavorites)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>@favorite.Property?.Title</span>
+                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@favorite.PropertyId" class="btn btn-sm btn-outline-primary">فتح</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="card p-3">
+                <h2 class="h6">اختصارات الإدارة</h2>
+                <div class="d-grid gap-2">
+                    <a asp-controller="Cities" asp-action="Index" class="btn btn-outline-secondary">إدارة المدن</a>
+                    <a asp-controller="Neighborhoods" asp-action="Index" class="btn btn-outline-secondary">إدارة الأحياء</a>
+                    <a asp-controller="PropertyTypes" asp-action="Index" class="btn btn-outline-secondary">إدارة الأنواع</a>
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-primary">لوحة الإدارة</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (recommended.Any())
+{
+    <div class="mt-4">
+        <h2 class="h5 mb-3">مقترحات لك بناءً على تفضيلاتك</h2>
+        <div class="row g-3">
+            @foreach (var property in recommended)
+            {
+                @await Html.PartialAsync("_PropertyCard", property)
+            }
+        </div>
+    </div>
+}
