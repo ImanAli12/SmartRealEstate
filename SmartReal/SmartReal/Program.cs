@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<RealDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("SmartReal")));
+builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("SmartReal")));
 
 var app = builder.Build();
 

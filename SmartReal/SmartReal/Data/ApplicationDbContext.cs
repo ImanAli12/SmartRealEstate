@@ -4,9 +4,9 @@ using RealEstateWebApp.Models;
 namespace SmartReal.Data
 {
 
-        public class RealDbContext : DbContext
+        public class ApplicationDbContext : DbContext
         {
-            public RealDbContext(DbContextOptions<RealDbContext> options) : base(options) { }
+            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);
