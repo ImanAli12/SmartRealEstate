@@ -1,4 +1,147 @@
 ﻿@{
-    ViewData["Title"] = "الطلبات";
+    ViewData["Title"] = "طلبات الزبائن | SYRELIS";
 }
-<h2 style="text-align:center;padding:50px;">صفحة الطلبات (قيد التطوير)</h2>
+
+<div class="page-header">
+    <h1>📋 طلبات الزبائن</h1>
+    <p>تعرف على ما يبحث عنه المشترون وعرض عقارك المناسب</p>
+</div>
+
+<div class="filter-section">
+    <input type="text" id="searchInput" placeholder="🔍 ابحث عن طلب..." oninput="filterRequests()" />
+    <select id="filterCity" onchange="filterRequests()">
+        <option value="">كل المدن</option>
+        <option value="دمشق">دمشق</option>
+        <option value="حلب">حلب</option>
+        <option value="حمص">حمص</option>
+        <option value="اللاذقية">اللاذقية</option>
+        <option value="طرطوس">طرطوس</option>
+        <option value="حماة">حماة</option>
+    </select>
+    <select id="filterType" onchange="filterRequests()">
+        <option value="">كل الأنواع</option>
+        <option value="شقة">شقة</option>
+        <option value="فيلا">فيلا</option>
+        <option value="محل تجاري">محل تجاري</option>
+        <option value="أرض">أرض</option>
+        <option value="مكتب">مكتب</option>
+    </select>
+    <button class="btn-search" onclick="filterRequests()">
+        <i class="fa-solid fa-magnifying-glass"></i> بحث
+    </button>
+</div>
+
+<div class="results-count" id="resultsCount">
+    عرض <strong id="countDisplay">0</strong> طلب
+</div>
+
+<div class="requests-grid" id="requestsGrid"></div>
+
+<div class="empty-state" id="emptyState" style="display: none;">
+    <i class="fa-regular fa-clipboard"></i>
+    <h3>لا توجد طلبات</h3>
+    <p>حاول تعديل البحث أو انتظر طلبات جديدة</p>
+</div>
+
+<script>
+    var requests = [
+        { id: 1, client: "أحمد محمد", type: "شقة", city: "دمشق", area: "المالكي", budget: 350000, currency: "USD", minArea: 150, rooms: 3, bathrooms: 2, description: "أبحث عن شقة فاخرة في منطقة المالكي بدمشق.", date: "2024-06-20", status: "جديد" },
+        { id: 2, client: "سارة خالد", type: "فيلا", city: "حلب", area: "الشهباء", budget: 500000, currency: "USD", minArea: 300, rooms: 5, bathrooms: 4, description: "نبحث عن فيلا مستقلة بحديقة خاصة في حلب.", date: "2024-06-18", status: "قيد المعالجة" },
+        { id: 3, client: "محمود علي", type: "محل تجاري", city: "اللاذقية", area: "الميناء", budget: 200000, currency: "USD", minArea: 80, rooms: 0, bathrooms: 1, description: "مطلوب محل تجاري في منطقة الميناء باللاذقية.", date: "2024-06-15", status: "جديد" },
+        { id: 4, client: "نورا حسين", type: "أرض", city: "حمص", area: "الريف الغربي", budget: 150000, currency: "USD", minArea: 2000, rooms: 0, bathrooms: 0, description: "أبحث عن أرض زراعية في ريف حمص الغربي.", date: "2024-06-12", status: "جديد" },
+        { id: 5, client: "عمر سليمان", type: "شقة", city: "طرطوس", area: "الشاطئ", budget: 300000, currency: "USD", minArea: 140, rooms: 3, bathrooms: 2, description: "مطلوب شقة مطلة على البحر في طرطوس.", date: "2024-06-10", status: "قيد المعالجة" },
+        { id: 6, client: "ليلى إبراهيم", type: "مكتب", city: "دمشق", area: "المزة", budget: 180000, currency: "USD", minArea: 90, rooms: 2, bathrooms: 1, description: "نبحث عن مكتب إداري في منطقة المزة بدمشق.", date: "2024-06-08", status: "جديد" }
+    ];
+
+    function renderRequests(reqs) {
+        var grid = document.getElementById('requestsGrid');
+        var empty = document.getElementById('emptyState');
+        var count = document.getElementById('countDisplay');
+        if (reqs.length === 0) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            count.textContent = '0';
+            return;
+        }
+        empty.style.display = 'none';
+        count.textContent = reqs.length;
+        var html = '';
+        for (var i = 0; i < reqs.length; i++) {
+            var r = reqs[i];
+            html += '<div class="request-card">';
+            html += '<div class="header"><span class="type-badge">' + r.type + '</span><span class="date"><i class="fa-regular fa-calendar"></i> ' + r.date + '</span></div>';
+            html += '<div class="title">' + r.client + '</div>';
+            html += '<div class="location"><i class="fa-solid fa-location-dot"></i> ' + r.city + ' - ' + r.area + '</div>';
+            html += '<div class="details">';
+            html += '<span><i class="fa-regular fa-square"></i> ' + r.minArea + '+ م²</span>';
+            if (r.rooms > 0) {
+                html += '<span><i class="fa-regular fa-bed"></i> ' + r.rooms + '+ غرف</span>';
+            }
+            if (r.bathrooms > 0) {
+                html += '<span><i class="fa-regular fa-bath"></i> ' + r.bathrooms + '+ حمامات</span>';
+            }
+            html += '<span>' + r.status + '</span>';
+            html += '</div>';
+            html += '<div class="budget">💰 ' + Number(r.budget).toLocaleString() + ' ' + r.currency + '</div>';
+            html += '<div class="description">' + r.description + '</div>';
+            html += '<div class="actions">';
+            html += '<button class="btn-contact" onclick="contactClient(' + r.id + ')"><i class="fa-regular fa-envelope"></i> تواصل مع الزبون</button>';
+            html += '<button class="btn-offer" onclick="makeOffer(' + r.id + ')"><i class="fa-regular fa-paper-plane"></i> عرض عقار</button>';
+            html += '</div></div>';
+        }
+        grid.innerHTML = html;
+    }
+
+    function filterRequests() {
+        var search = document.getElementById('searchInput').value.toLowerCase().trim();
+        var city = document.getElementById('filterCity').value;
+        var type = document.getElementById('filterType').value;
+        var filtered = [];
+        for (var i = 0; i < requests.length; i++) {
+            var r = requests[i];
+            var matchSearch = r.client.toLowerCase().indexOf(search) !== -1 ||
+                r.area.toLowerCase().indexOf(search) !== -1 ||
+                r.city.indexOf(search) !== -1 ||
+                r.description.toLowerCase().indexOf(search) !== -1;
+            var matchCity = city === '' || r.city === city;
+            var matchType = type === '' || r.type === type;
+            if (matchSearch && matchCity && matchType) {
+                filtered.push(r);
+            }
+        }
+        renderRequests(filtered);
+    }
+
+    function contactClient(id) {
+        var r = null;
+        for (var i = 0; i < requests.length; i++) {
+            if (requests[i].id === id) {
+                r = requests[i];
+                break;
+            }
+        }
+        if (r) {
+            // هنا تم تعريف المتغير email بشكل صحيح
+            var email = r.client.replace(' ', '.').toLowerCase() + 'email.com';
+            alert("📞 التواصل مع " + r.client + "\n\n📧 البريد: " + email + "\n📱 الهاتف: 09" + Math.floor(10000000 + Math.random() * 90000000));
+        }
+    }
+
+    function makeOffer(id) {
+        var r = null;
+        for (var i = 0; i < requests.length; i++) {
+            if (requests[i].id === id) {
+                r = requests[i];
+                break;
+            }
+        }
+        if (r) {
+            alert("🏠 عرض عقار لـ " + r.client + "\n\n📋 تفاصيل الطلب:\n• نوع العقار: " + r.type + "\n• الموقع: " + r.city + " - " + r.area + "\n• الميزانية: " + Number(r.budget).toLocaleString() + " " + r.currency + "\n• المساحة: " + r.minArea + "+ م²");
+            window.location.href = '/Home/About?tab=addProperty';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderRequests(requests);
+    });
+</script>

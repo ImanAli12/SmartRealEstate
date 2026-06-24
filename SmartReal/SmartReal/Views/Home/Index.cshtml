@@ -1,31 +1,42 @@
 ﻿@model List<Property>
 @{
-    ViewData["Title"] = "SYRELIS | العقارات الفاخرة";
+    ViewData["Title"] = "SYRELIS | العقارات الفاخرة في سوريا";
     var cities = ViewBag.Cities as List<City> ?? new List<City>();
 }
 
-<!-- الهيرو -->
-<section class="hero" style="background:linear-gradient(126deg,rgba(11,19,32,0.85),rgba(11,19,32,0.62)),url('https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format');background-size:cover;background-position:center;min-height:627px;display:flex;align-items:center;text-align:center;padding:20px;">
-    <div class="hero-content" style="max-width:750px;margin:0 auto;width:100%;">
-        <h1 style="font-family:'Cinzel',serif;font-size:2.8rem;font-weight:800;color:white;margin-bottom:15px;">منزل <span style="color:#d4af37;">أحلامك</span><br />يبدأ من SYRELIS</h1>
-        <p style="font-size:1.1rem;color:rgba(255,255,255,0.9);margin-bottom:25px;line-height:1.7;">أكبر منصة عقارية فاخرة في سوريا – أكثر من 10,000 عقار حصري بثقة وأمان كامل</p>
+<nav class="navbar">
+    <img class="logo" src="~/images/hero.png" alt="SYRELIS Logo" />
+    <ul class="nav-links">
+        <li><a href="/">الرئيسية</a></li>
+        <li><a href="/Home/About?tab=addProperty" id="announceLink">أعلن عن عقارك</a></li>
+        <li><a href="/Property/Search">ابحث عن عقارك</a></li>
+        <li><a href="/Home/About">حسابي</a></li>
+        <li><a href="#contactSection" id="contactNavLink">تواصل معنا</a></li>
+    </ul>
+    <button class="login-btn-nav" id="openModalBtn">تسجيل الدخول</button>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>منزل <span>أحلامك</span><br />يبدأ من SYRELIS</h1>
+        <p>أكبر منصة عقارية فاخرة في سوريا – أكثر من 10,000 عقار حصري بثقة وأمان كامل</p>
         <div>
-            <button class="btn-primary" onclick="location.href='@Url.Action("Index","Property")'" style="padding:12px 35px;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;transition:0.3s;border:none;margin:0 8px;background:#d4af37;color:#0b1320;"><i class="fa-solid fa-building"></i> استكشف العقارات</button>
-            <button class="btn-outline" onclick="location.href='@Url.Action("Requests","Home")'" style="padding:12px 35px;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;transition:0.3s;border:none;margin:0 8px;background:transparent;border:1.5px solid #d4af37;color:white;"><i class="fa-regular fa-clipboard"></i> العقارات المطلوبة</button>
+            <button class="btn-primary" onclick="window.location.href='/Property/Index'"><i class="fa-solid fa-building"></i> استكشف العقارات</button>
+            <button class="btn-outline" onclick="window.location.href='/Home/Requests'"><i class="fa-regular fa-clipboard"></i> العقارات المطلوبة</button>
         </div>
     </div>
 </section>
 
-<!-- عقارات مميزة -->
-<section class="featured" style="padding:70px 0;background:#e3e4e7cc;">
-    <div class="container" style="max-width:1300px;margin:0 auto;padding:0 20px;">
-        <h2 class="section-title" style="text-align:center;font-family:'Tajawal',serif;border-bottom:3px solid #d4af37;width:fit-content;margin:0 auto 45px;padding-bottom:8px;font-size:2.2rem;">عقارات <span style="color:#d4af37;font-size:43px;">Syrelis</span></h2>
-        <div class="cards-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;">
-            @foreach (var item in Model)
+<section class="featured">
+    <div class="container">
+        <h2 class="section-title">عقارات <span style="font-size:43px">Syrelis</span></h2>
+        <div class="cards-grid">
+            @foreach (var item in Model.Take(6))
             {
-                <div class="property-card" style="border-radius:16px;overflow:hidden;box-shadow:0 0 0 0.7px rgba(24,35,55,0.56),0 1px 20px -5px rgba(2,29,76,0.4);cursor:pointer;" onclick="location.href='@Url.Action("Details","Property",new { id = item.Id })'">
+                var mainImage = item.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl ?? "/images/default.jpg";
+                <div class="property-card" style="border-radius:16px;overflow:hidden;box-shadow:0 0 0 0.7px rgba(24,35,55,0.56),0 1px 20px -5px rgba(2,29,76,0.4);cursor:pointer;" onclick="window.location.href='/Property/Details/@item.Id'">
                     <div class="property-image" style="position:relative;height:200px;overflow:hidden;">
-                        <img src="@(item.Images.FirstOrDefault(i=>i.IsMain)?.ImageUrl ?? "/images/default.jpg")" alt="@item.Title" style="width:100%;height:100%;object-fit:cover;" />
+                        <img src="@mainImage" alt="@item.Title" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='/images/default.jpg'" />
                     </div>
                     <div class="property-content" style="padding:15px;background:#e8e8e8;">
                         <h4 style="font-size:18px;font-weight:700;">@item.Title</h4>
@@ -35,18 +46,303 @@
             }
         </div>
     </div>
+    <div class="container-cities">
+        @foreach (var city in cities)
+        {
+            <a href="/Property/Index?province=@city.NameAr" style="text-decoration: none; display: block;">
+                <div class="container-city">
+                    <img src="~/images/@(city.NameAr).jpg" alt="@city.NameAr" onerror="this.src='/images/default-city.jpg'" />
+                    <div class="overlay"></div>
+                    <div class="city">@city.NameAr</div>
+                </div>
+            </a>
+        }
+    </div>
 </section>
 
-<!-- شبكة المدن -->
-<div class="container-cities" style="max-width:1300px;margin:40px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
-    @foreach (var city in cities)
-    {
-        <a href="@Url.Action("Index","Property",new { province = city.NameAr })" style="text-decoration:none;display:block;">
-            <div class="container-city" style="position:relative;border-radius:24px;overflow:hidden;aspect-ratio:1/1;cursor:pointer;transition:all 0.4s ease;">
-                <img src="@($"/images/cities/{city.NameAr}.jpg")" alt="@city.NameAr" onerror="this.src='/images/default-city.jpg'" style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s;" />
-                <div class="overlay" style="position:absolute;inset:0;background:#080d16;opacity:0.6;"></div>
-                <div class="city" style="position:absolute;bottom:20px;right:20px;color:white;font-size:1.6rem;font-weight:700;z-index:2;padding:5px 18px;border-radius:30px;">@city.NameAr</div>
+<section class="contact-section" id="contactSection">
+    <div class="contact-grid">
+        <div class="contact-info">
+            <h3><i class="fas fa-crown"></i> SYRELIS</h3>
+            <p>منصة العقارات الفاخرة الرائدة في سوريا.</p>
+            <div class="contact-detail"><i class="fas fa-map-marker-alt"></i><span>دمشق – برج سيريليس، شارع المالكي</span></div>
+            <div class="contact-detail"><i class="fas fa-phone-alt"></i><span>+963 11 234 5678</span></div>
+            <div class="contact-detail"><i class="fas fa-envelope"></i><span>info@syrelis.com</span></div>
+            <div class="contact-detail"><i class="fas fa-clock"></i><span>الأحد – الخميس: 9ص – 8م</span></div>
+        </div>
+        <div class="contact-form">
+            <h3><i class="fas fa-pen-fancy"></i> راسلنا</h3>
+            <input type="text" id="contactName" placeholder="الاسم الكامل" />
+            <input type="email" id="contactEmail" placeholder="البريد الإلكتروني" />
+            <textarea rows="3" id="contactMsg" placeholder="رسالتك..."></textarea>
+            <button id="sendMsgBtn">إرسال الرسالة <i class="fas fa-paper-plane"></i></button>
+            <div id="formFeedback" style="margin-top:10px;font-size:0.75rem"></div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-logo">SYRELIS</div>
+        <div class="footer-copyright">© 2026 SYRELIS – جميع الحقوق محفوظة</div>
+        <div class="footer-social">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </div>
+</footer>
+
+<div id="authModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+            <div class="logo-icon"><img class="logo_loin" src="~/images/logo_loin.png" alt="" /></div>
+            <h2 id="modalTitle">SYRELIS</h2>
+            <p id="modalSubtitle">سجل دخولك للوصول إلى حسابك</p>
+        </div>
+        <div class="modal-body">
+            <div id="messageBox" class="message"></div>
+            <div id="loginPanel">
+                <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" placeholder="البريد الإلكتروني" /></div>
+                <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="loginPassword" placeholder="كلمة المرور (8 خانات)" /></div>
+                <button class="auth-btn" id="doLoginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+                <div class="toggle-auth">ليس لديك حساب؟ <a id="switchToSignupBtn">إنشاء حساب جديد</a></div>
             </div>
-        </a>
-    }
+            <div id="signupPanel" style="display:none">
+                <div class="input-group"><i class="fas fa-user"></i><input type="text" id="signupName" placeholder="الاسم الكامل" /></div>
+                <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="signupEmail" placeholder="البريد الإلكتروني" /></div>
+                <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="signupPassword" placeholder="كلمة المرور (8 خانات)" /></div>
+                <div class="input-group"><i class="fas fa-check-circle"></i><input type="password" id="signupConfirm" placeholder="تأكيد كلمة المرور" /></div>
+                <button class="auth-btn" id="doSignupBtn"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
+                <div class="toggle-auth">لديك حساب؟ <a id="switchToLoginBtn">تسجيل الدخول</a></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div id="loginRequiredModal" class="modal-overlay login-required-modal">
+    <div class="modal-card">
+        <button class="close-modal" id="closeRequiredModalBtn" style="top:18px;left:26.7rem;color:#1a2c44;">&times;</button>
+        <div class="login-required-icon"><i class="fas fa-lock"></i></div>
+        <h2 class="login-required-title">يجب تسجيل الدخول أولاً</h2>
+        <p class="login-required-text" id="loginRequiredText">للوصول إلى هذه الصفحة، يجب أن تكون مسجلاً دخولك.<br />سجّل دخولك الآن واستمتع بجميع خدماتنا!</p>
+        <div class="login-required-buttons">
+            <button class="btn-cancel" id="cancelRequiredBtn"><i class="fas fa-times"></i> إلغاء</button>
+            <button class="btn-login-now" id="goToLoginBtn"><i class="fas fa-sign-in-alt"></i> سجل دخولك الآن</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== جميع الكود البرمجي =====
+    var modal = document.getElementById("authModal");
+    var loginPanel = document.getElementById("loginPanel");
+    var signupPanel = document.getElementById("signupPanel");
+    var openModalBtn = document.getElementById("openModalBtn");
+    var closeModalBtn = document.getElementById("closeModalBtn");
+    var switchToSignup = document.getElementById("switchToSignupBtn");
+    var switchToLogin = document.getElementById("switchToLoginBtn");
+    var modalTitle = document.getElementById("modalTitle");
+    var modalSubtitle = document.getElementById("modalSubtitle");
+    var messageBox = document.getElementById("messageBox");
+
+    var loginRequiredModal = document.getElementById("loginRequiredModal");
+    var closeRequiredModalBtn = document.getElementById("closeRequiredModalBtn");
+    var cancelRequiredBtn = document.getElementById("cancelRequiredBtn");
+    var goToLoginBtn = document.getElementById("goToLoginBtn");
+    var loginRequiredText = document.getElementById("loginRequiredText");
+
+    function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className = "message " + type;
+        messageBox.style.display = "block";
+        setTimeout(function() {
+            messageBox.style.display = "none";
+            messageBox.className = "message";
+        }, 4000);
+    }
+
+    function isLoggedIn() {
+        return localStorage.getItem("syrelis_logged_in") === "true";
+    }
+
+    function setLoggedIn(value) {
+        if (value) {
+            localStorage.setItem("syrelis_logged_in", "true");
+        } else {
+            localStorage.removeItem("syrelis_logged_in");
+        }
+    }
+
+    function isValidEmail(email) {
+        var re = 1;
+        return re.test(email);
+    }
+
+    function openAuthModal() {
+        modal.classList.add("active");
+        loginPanel.style.display = "block";
+        signupPanel.style.display = "none";
+        modalTitle.textContent = "SYRELIS";
+        modalSubtitle.textContent = "سجل دخولك للوصول إلى حسابك";
+    }
+
+    function closeAuthModal() {
+        modal.classList.remove("active");
+    }
+
+    modal.onclick = function(e) {
+        if (e.target === modal) closeAuthModal();
+    };
+
+    switchToSignup.onclick = function() {
+        loginPanel.style.display = "none";
+        signupPanel.style.display = "block";
+        modalTitle.textContent = "انضم إلينا";
+        modalSubtitle.textContent = "أفتح حسابك الآن";
+    };
+
+    switchToLogin.onclick = function() {
+        signupPanel.style.display = "none";
+        loginPanel.style.display = "block";
+        modalTitle.textContent = "SYRELIS";
+        modalSubtitle.textContent = "سجل دخولك";
+    };
+
+    closeRequiredModalBtn.onclick = function() {
+        loginRequiredModal.classList.remove("active");
+    };
+
+    cancelRequiredBtn.onclick = function() {
+        loginRequiredModal.classList.remove("active");
+    };
+
+    loginRequiredModal.onclick = function(e) {
+        if (e.target === loginRequiredModal) loginRequiredModal.classList.remove("active");
+    };
+
+    goToLoginBtn.onclick = function() {
+        loginRequiredModal.classList.remove("active");
+        setTimeout(function() { openAuthModal(); }, 300);
+    };
+
+    document.getElementById("doLoginBtn").onclick = function() {
+        var email = document.getElementById("loginEmail").value.trim();
+        var password = document.getElementById("loginPassword").value;
+        if (!email || !password) {
+            showMessage("الرجاء إدخال البريد وكلمة المرور", "error");
+            return;
+        }
+        if (!isValidEmail(email)) {
+            showMessage("البريد الإلكتروني غير صحيح!", "error");
+            return;
+        }
+        if (password.length < 8) {
+            showMessage("كلمة المرور يجب أن تكون 8 أحرف على الأقل!", "error");
+            return;
+        }
+        setLoggedIn(true);
+        showMessage("مرحباً بعودتك! تم تسجيل الدخول بنجاح", "success");
+        var targetUrl = loginRequiredModal.dataset.targetUrl;
+        setTimeout(function() {
+            closeAuthModal();
+            if (targetUrl) {
+                window.location.href = targetUrl;
+                delete loginRequiredModal.dataset.targetUrl;
+            } else {
+                window.location.href = "/Home/About?tab=addProperty";
+            }
+        }, 1500);
+    };
+
+    document.getElementById("doSignupBtn").onclick = function() {
+        var name = document.getElementById("signupName").value.trim();
+        var email = document.getElementById("signupEmail").value.trim();
+        var password = document.getElementById("signupPassword").value;
+        var confirm = document.getElementById("signupConfirm").value;
+        if (!name || !email || !password || !confirm) {
+            showMessage("الرجاء ملء جميع الحقول", "error");
+            return;
+        }
+        if (!isValidEmail(email)) {
+            showMessage("البريد الإلكتروني غير صحيح!", "error");
+            return;
+        }
+        if (password.length < 8) {
+            showMessage("كلمة المرور يجب أن تكون 8 أحرف على الأقل!", "error");
+            return;
+        }
+        if (password !== confirm) {
+            showMessage("كلمتا المرور غير متطابقتين", "error");
+            return;
+        }
+        showMessage("تهانينا " + name + "! تم إنشاء حسابك بنجاح", "success");
+        setTimeout(function() { switchToLogin.click(); }, 1500);
+    };
+
+    document.getElementById("announceLink").onclick = function(e) {
+        e.preventDefault();
+        if (isLoggedIn()) {
+            window.location.href = "/Home/About?tab=addProperty";
+        } else {
+            loginRequiredText.innerHTML = "لإعلان عقارك، يجب أن تكون مسجلاً دخولك.<br>سجّل دخولك الآن وانشر عقارك بكل سهولة!";
+            loginRequiredModal.dataset.targetUrl = "/Home/About?tab=addProperty";
+            loginRequiredModal.classList.add("active");
+        }
+    };
+
+    document.getElementById("myAccountLink").onclick = function(e) {
+        e.preventDefault();
+        if (isLoggedIn()) {
+            window.location.href = "/Home/About";
+        } else {
+            loginRequiredText.innerHTML = "للوصول إلى حسابك، يجب أن تكون مسجلاً دخولك.<br>سجّل دخولك الآن لإدارة عقاراتك!";
+            loginRequiredModal.dataset.targetUrl = "/Home/About";
+            loginRequiredModal.classList.add("active");
+        }
+    };
+
+    function updateAuthUI() {
+        var btn = document.getElementById("openModalBtn");
+        if (isLoggedIn()) {
+            btn.textContent = "تسجيل الخروج";
+            btn.classList.add("logout-active");
+            btn.onclick = logout;
+        } else {
+            btn.textContent = "تسجيل الدخول";
+            btn.classList.remove("logout-active");
+            btn.onclick = openAuthModal;
+        }
+    }
+
+    function logout() {
+        if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+            setLoggedIn(false);
+            showMessage("تم تسجيل خروجك بنجاح", "success");
+            setTimeout(function() {
+                updateAuthUI();
+                location.reload();
+            }, 1000);
+        }
+    }
+
+    document.getElementById("contactNavLink").onclick = function(e) {
+        e.preventDefault();
+        document.getElementById("contactSection").scrollIntoView({ behavior: "smooth" });
+    };
+
+    document.getElementById("sendMsgBtn").onclick = function() {
+        var name = document.getElementById("contactName").value;
+        if (name) {
+            document.getElementById("formFeedback").innerHTML = '<span style="color:#D4AF37;">✓ تم إرسال رسالتك</span>';
+            setTimeout(function() {
+                document.getElementById("formFeedback").innerHTML = "";
+            }, 3000);
+        } else {
+            alert("الرجاء إدخال اسمك");
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", updateAuthUI);
+</script>
