@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "البحث عن عقار";
+    var cities = ViewBag.Cities as List<City> ?? new List<City>();
+    var types = ViewBag.PropertyTypes as List<PropertyType> ?? new List<PropertyType>();
+}
+
+<div class="container" style="max-width:800px;margin:50px auto;padding:30px;background:white;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center;font-family:'Cinzel',serif;margin-bottom:30px;">ابحث عن عقارك</h2>
+    <form asp-controller="Property" asp-action="Search" method="get" style="display:flex;flex-direction:column;gap:18px;">
+        <input type="text" name="keyword" placeholder="كلمة البحث (عنوان أو وصف)" style="padding:14px 20px;border:1.5px solid #e8e8ec;border-radius:60px;font-size:1rem;font-family:'Tajawal',sans-serif;" />
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+            <select name="cityId" style="padding:14px 20px;border:1.5px solid #e8e8ec;border-radius:60px;font-size:1rem;font-family:'Tajawal',sans-serif;">
+                <option value="">كل المدن</option>
+                @foreach (var city in cities)
+                {
+                    <option value="@city.Id">@city.NameAr</option>
+                }
+            </select>
+            <select name="typeId" style="padding:14px 20px;border:1.5px solid #e8e8ec;border-radius:60px;font-size:1rem;font-family:'Tajawal',sans-serif;">
+                <option value="">كل الأنواع</option>
+                @foreach (var type in types)
+                {
+                    <option value="@type.Id">@type.NameAr</option>
+                }
+            </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+            <input type="number" name="minPrice" placeholder="السعر من" step="0.01" style="padding:14px 20px;border:1.5px solid #e8e8ec;border-radius:60px;font-size:1rem;font-family:'Tajawal',sans-serif;" />
+            <input type="number" name="maxPrice" placeholder="السعر إلى" step="0.01" style="padding:14px 20px;border:1.5px solid #e8e8ec;border-radius:60px;font-size:1rem;font-family:'Tajawal',sans-serif;" />
+        </div>
+        <button type="submit" style="padding:16px;background:linear-gradient(135deg,#0b1320,#1a2a3e);border:1px solid #d4af37;border-radius:60px;color:#d4af37;font-weight:800;font-size:1.1rem;cursor:pointer;transition:0.3s;">ابحث</button>
+    </form>
+</div>

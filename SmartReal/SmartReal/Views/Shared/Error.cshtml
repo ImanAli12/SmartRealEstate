@@ -1,0 +1,22 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">خطأ.</h1>
+<h2 class="text-danger">حدث خطأ أثناء معالجة طلبك.</h2>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>معرف الطلب:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+<h3>وضع التطوير</h3>
+<p>
+    التبديل إلى بيئة <strong>التطوير</strong> سيعرض معلومات أكثر تفصيلاً عن الخطأ.
+</p>
+<p>
+    <strong>لا تقم بتمكين وضع التطوير في التطبيقات المنشورة.</strong>
+</p>

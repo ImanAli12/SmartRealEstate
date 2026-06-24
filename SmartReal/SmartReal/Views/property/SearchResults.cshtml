@@ -1,0 +1,23 @@
+﻿@model List<Property>
+@{
+    ViewData["Title"] = "نتائج البحث";
+}
+
+<div class="container" style="max-width:1400px;margin:30px auto;padding:0 20px;">
+    <h2 style="text-align:center;font-family:'Cinzel',serif;margin-bottom:30px;">نتائج البحث</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="properties-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:25px;">
+            @foreach (var item in Model)
+            {
+                <!-- استدعاء البطاقة الجزئية -->
+                <partial name="_PropertyCard" model="item" />
+            }
+        </div>
+    }
+    else
+    {
+        <p style="text-align:center;font-size:1.2rem;color:#6b7280;">لا توجد عقارات تطابق بحثك</p>
+    }
+</div>

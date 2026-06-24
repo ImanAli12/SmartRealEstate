@@ -1,0 +1,52 @@
+﻿@model List<Property>
+@{
+    ViewData["Title"] = "SYRELIS | العقارات الفاخرة";
+    var cities = ViewBag.Cities as List<City> ?? new List<City>();
+}
+
+<!-- الهيرو -->
+<section class="hero" style="background:linear-gradient(126deg,rgba(11,19,32,0.85),rgba(11,19,32,0.62)),url('https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format');background-size:cover;background-position:center;min-height:627px;display:flex;align-items:center;text-align:center;padding:20px;">
+    <div class="hero-content" style="max-width:750px;margin:0 auto;width:100%;">
+        <h1 style="font-family:'Cinzel',serif;font-size:2.8rem;font-weight:800;color:white;margin-bottom:15px;">منزل <span style="color:#d4af37;">أحلامك</span><br />يبدأ من SYRELIS</h1>
+        <p style="font-size:1.1rem;color:rgba(255,255,255,0.9);margin-bottom:25px;line-height:1.7;">أكبر منصة عقارية فاخرة في سوريا – أكثر من 10,000 عقار حصري بثقة وأمان كامل</p>
+        <div>
+            <button class="btn-primary" onclick="location.href='@Url.Action("Index","Property")'" style="padding:12px 35px;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;transition:0.3s;border:none;margin:0 8px;background:#d4af37;color:#0b1320;"><i class="fa-solid fa-building"></i> استكشف العقارات</button>
+            <button class="btn-outline" onclick="location.href='@Url.Action("Requests","Home")'" style="padding:12px 35px;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;transition:0.3s;border:none;margin:0 8px;background:transparent;border:1.5px solid #d4af37;color:white;"><i class="fa-regular fa-clipboard"></i> العقارات المطلوبة</button>
+        </div>
+    </div>
+</section>
+
+<!-- عقارات مميزة -->
+<section class="featured" style="padding:70px 0;background:#e3e4e7cc;">
+    <div class="container" style="max-width:1300px;margin:0 auto;padding:0 20px;">
+        <h2 class="section-title" style="text-align:center;font-family:'Tajawal',serif;border-bottom:3px solid #d4af37;width:fit-content;margin:0 auto 45px;padding-bottom:8px;font-size:2.2rem;">عقارات <span style="color:#d4af37;font-size:43px;">Syrelis</span></h2>
+        <div class="cards-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;">
+            @foreach (var item in Model)
+            {
+                <div class="property-card" style="border-radius:16px;overflow:hidden;box-shadow:0 0 0 0.7px rgba(24,35,55,0.56),0 1px 20px -5px rgba(2,29,76,0.4);cursor:pointer;" onclick="location.href='@Url.Action("Details","Property",new { id = item.Id })'">
+                    <div class="property-image" style="position:relative;height:200px;overflow:hidden;">
+                        <img src="@(item.Images.FirstOrDefault(i=>i.IsMain)?.ImageUrl ?? "/images/default.jpg")" alt="@item.Title" style="width:100%;height:100%;object-fit:cover;" />
+                    </div>
+                    <div class="property-content" style="padding:15px;background:#e8e8e8;">
+                        <h4 style="font-size:18px;font-weight:700;">@item.Title</h4>
+                        <p style="font-size:15px;font-weight:700;color:#4949497a;">@item.Price.ToString("N0") @item.PriceCurrency</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- شبكة المدن -->
+<div class="container-cities" style="max-width:1300px;margin:40px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+    @foreach (var city in cities)
+    {
+        <a href="@Url.Action("Index","Property",new { province = city.NameAr })" style="text-decoration:none;display:block;">
+            <div class="container-city" style="position:relative;border-radius:24px;overflow:hidden;aspect-ratio:1/1;cursor:pointer;transition:all 0.4s ease;">
+                <img src="@($"/images/cities/{city.NameAr}.jpg")" alt="@city.NameAr" onerror="this.src='/images/default-city.jpg'" style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s;" />
+                <div class="overlay" style="position:absolute;inset:0;background:#080d16;opacity:0.6;"></div>
+                <div class="city" style="position:absolute;bottom:20px;right:20px;color:white;font-size:1.6rem;font-weight:700;z-index:2;padding:5px 18px;border-radius:30px;">@city.NameAr</div>
+            </div>
+        </a>
+    }
+</div>

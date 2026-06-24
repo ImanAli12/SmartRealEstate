@@ -1,34 +1,40 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RealEstateWebApp.Models;
 using SmartReal.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// إضافة الخدمات
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("SmartReal")));
+
+// ربط قاعدة البيانات
+builder.Services.AddDbContext<ApplicationDbContext>(o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("SmartReal")));
+
+// ✅ إضافة Identity مع دعم Entity Framework (الحل الصحيح)
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
+// إعدادات خطوط الأنابيب
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
+app.UseAuthentication(); // مهم
 app.UseAuthorization();
-
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Game}/{action=Index}/{id?}");
-
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

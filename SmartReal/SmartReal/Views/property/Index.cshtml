@@ -1,0 +1,78 @@
+﻿@model List<Property>
+@{
+    ViewData["Title"] = "عقارات للبيع";
+    var province = Context.Request.Query["province"].ToString();
+    if (!string.IsNullOrEmpty(province))
+        ViewData["Title"] = $"عقارات في محافظة {province}";
+}
+
+<div class="container" style="max-width:1400px;margin:0 auto;padding:0 20px;">
+    <div class="province-header" style="padding:30px 35px;margin-top:33px;margin-bottom:30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;width:100%;border-bottom:2px solid #d4af37;">
+        <div class="province-info" style="display:flex;align-items:center;gap:20px;">
+            <div class="province-icon" style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;color:#bc9a2d;border:3px solid #cac3bc;">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <div class="province-title">
+                <h1 style="color:#d4af37;">
+                    @if (!string.IsNullOrEmpty(province))
+                    {
+                        <text>محافظة @province</text>
+                    }
+                    else
+                    {
+                        <text>جميع العقارات</text>
+                    }
+                </h1>
+                <p style="color:rgba(0,0,0,0.6);">@Model.Count عقار</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="properties-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:25px;">
+        @foreach (var item in Model)
+        {
+            <div class="property-card" style="border-radius:16px;overflow:hidden;box-shadow:0 0 0 0.7px rgba(24,35,55,0.56),0 1px 20px -5px rgba(2,29,76,0.4);transition:transform 0.4s;">
+                <div class="property-image" style="position:relative;height:300px;overflow:hidden;">
+                    <span class="badge badge-for-sale" style="position:absolute;padding:8px 25px;font-size:13px;font-weight:700;z-index:3;clip-path:polygon(15% 0%,100% 0%,100% 100%,15% 100%,0% 50%);top:15px;right:0;background:#059669;color:white;border:2px solid rgba(255,255,255,0.2);">للبيع</span>
+                    <div class="overlay" style="position:absolute;inset:0;background:rgba(11,19,32,0.525);transition:opacity 0.5s;z-index:1;"></div>
+                    <img src="@(item.Images.FirstOrDefault(i=>i.IsMain)?.ImageUrl ?? "/images/default.jpg")" alt="@item.Title" style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s;" />
+                </div>
+                <div class="property-content" style="position:relative;padding:25px;background:#e8e8e8;overflow:hidden;transition:background 0.5s;">
+                    <div class="content-overlay" style="position:absolute;inset:0;background:rgba(11,19,32,0.094);opacity:0.85;transition:opacity 0.3s;z-index:1;"></div>
+                    <h3 class="property-title" style="font-size:21px;font-weight:700;margin-bottom:8px;line-height:1.5;color:#1e2f4f;position:relative;z-index:2;">@item.Title</h3>
+                    <div class="property-price" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:18px;border-bottom:2px solid rgba(212,175,55,0.3);position:relative;z-index:2;">
+                        <span class="price-original" style="font-size:15px;font-weight:700;color:#4949497a;">@item.Price.ToString("N0") @item.PriceCurrency</span>
+                    </div>
+                    <div class="property-location" style="display:flex;align-items:center;margin-bottom:10px;font-size:14px;font-weight:500;color:#4949497a;position:relative;z-index:2;">
+                        <i class="fas fa-map-marker-alt" style="margin-left:10px;color:#b29023;"></i>
+                        <span>@(item.City?.NameAr ?? "") - @(item.Neighborhood?.NameAr ?? "")</span>
+                    </div>
+                    <div class="property-type" style="display:flex;align-items:center;margin-bottom:18px;font-size:14px;font-weight:600;color:#663939;position:relative;z-index:2;">
+                        <i class="fas fa-building" style="margin-left:10px;color:#d4af37;"></i>
+                        <span>@(item.PropertyType?.NameAr ?? "نوع غير محدد")</span>
+                    </div>
+                    <div class="property-meta" style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500;color:#4949497a;position:relative;z-index:2;">
+                        <span><i class="fas fa-user" style="margin-left:8px;color:#d4af37;"></i> @(item.Advertiser?.FullName ?? "معلن")</span>
+                    </div>
+                </div>
+                <div class="property-footer" style="background:linear-gradient(135deg,#0b1320,#1a253a);padding:15px 25px;display:flex;align-items:center;justify-content:space-between;color:white;border-top:3px solid #d4af37;flex-wrap:wrap;gap:10px;">
+                    <div class="footer-features" style="display:flex;gap:15px;flex-wrap:wrap;">
+                        <div class="footer-item" style="display:flex;align-items:center;font-size:14px;font-weight:600;">
+                            <i class="fas fa-door-open" style="margin-left:10px;font-size:18px;color:#d4af37;"></i> @item.Rooms
+                        </div>
+                        <div class="footer-item" style="display:flex;align-items:center;font-size:14px;font-weight:600;">
+                            <i class="fas fa-ruler-combined" style="margin-left:10px;font-size:18px;color:#d4af37;"></i> @item.Area م²
+                        </div>
+                        <div class="footer-item" style="display:flex;align-items:center;font-size:14px;font-weight:600;">
+                            <i class="fas fa-bath" style="margin-left:10px;font-size:18px;color:#d4af37;"></i> @item.Bathrooms
+                        </div>
+                    </div>
+                    <button class="btn-favorite" onclick="handleFavorite(@item.Id, this)" data-id="@item.Id" style="background:linear-gradient(207deg,#0d2243,#3d6c9a73);color:#d7d8d9;border:1px solid #ffffff;padding:8px 16px;border-radius:30px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.3s;display:inline-flex;align-items:center;gap:6px;font-family:'Tajawal',sans-serif;">
+                        <i class="far fa-heart"></i>
+                        <span>أضف للمفضلة</span>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>

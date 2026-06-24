@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SYRELIS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ========== كل الـ CSS الموجود في الواجهات ========== */
+        :root {
+            --dark: #0b1320;
+            --gold: #d4af37;
+            --gray: #6b7280;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Tajawal", sans-serif;
+            background: #f5f6fa;
+            color: #0b1320;
+            scroll-behavior: smooth;
+        }
+
+        .navbar {
+            background: rgba(11,19,32,0.96);
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(212,175,55,0.4);
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            width: 82px;
+            margin: 8px 0;
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0;
+        }
+
+            .nav-links a {
+                color: #f2efea;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 0.95rem;
+                transition: 0.3s;
+                white-space: nowrap;
+            }
+
+                .nav-links a:hover {
+                    color: #d4af37;
+                }
+
+        .login-btn-nav {
+            background: transparent;
+            border: 1.5px dashed #d4af37;
+            color: #d4af37;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: "Tajawal", sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+            .login-btn-nav:hover {
+                background: #d4af37;
+                color: #0b1320;
+            }
+        /* باقي الأنماط (الهيرو، الكاردات، المودال، إلخ) تأتي من الواجهات */
+        /* ... (ضع هنا كل الـ CSS من index.html و properties.html) ... */
+        /* أنصحك بنسخ الـ CSS الكامل من ملفاتك وتلصقه هنا */
+    </style>
+</head>
+<body>
+    <!-- ========== شريط التنقل ========== -->
+    <nav class="navbar">
+        <img class="logo" src="~/images/hero.png" alt="SYRELIS" />
+        <ul class="nav-links">
+            <li><a asp-controller="Home" asp-action="Index">الرئيسية</a></li>
+            <li><a href="#" id="announceLink">أعلن عن عقارك</a></li>
+            <li><a asp-controller="Property" asp-action="Search">ابحث عن عقارك</a></li>
+            <li><a href="#" id="myAccountLink">حسابي</a></li>
+            <li><a href="#contactSection">تواصل معنا</a></li>
+        </ul>
+        <button class="login-btn-nav" id="openModalBtn">تسجيل الدخول</button>
+    </nav>
+
+    <!-- ========== محتوى الصفحة ========== -->
+    @RenderBody()
+
+    <!-- ========== مودال تسجيل الدخول ========== -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+                <div class="logo-icon">
+                    <img class="logo_loin" src="~/images/hero.png" alt="SYRELIS" />
+                </div>
+                <h2 id="modalTitle">تسجيل الدخول</h2>
+                <p id="modalSubtitle">أهلاً بك مجدداً</p>
+            </div>
+            <div class="modal-body">
+                <div id="messageBox" class="message"></div>
+                <div id="loginPanel">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" />
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="كلمة المرور" />
+                    </div>
+                    <button class="auth-btn" id="loginBtn">تسجيل الدخول</button>
+                    <div class="toggle-auth">
+                        ليس لديك حساب؟ <a id="switchToSignupBtn">إنشاء حساب جديد</a>
+                    </div>
+                </div>
+                <div id="signupPanel" style="display:none;">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupFullName" placeholder="الاسم الكامل" />
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signupEmail" placeholder="البريد الإلكتروني" />
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" placeholder="كلمة المرور" />
+                    </div>
+                    <button class="auth-btn" id="signupBtn">إنشاء حساب</button>
+                    <div class="toggle-auth">
+                        لديك حساب؟ <a id="switchToLoginBtn">تسجيل الدخول</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== مودال "يجب تسجيل الدخول" ========== -->
+    <div class="modal-overlay login-required-modal" id="loginRequiredModal">
+        <div class="modal-card">
+            <div class="login-required-icon"><i class="fas fa-user-lock"></i></div>
+            <h3 class="login-required-title">يجب تسجيل الدخول</h3>
+            <p class="login-required-text">هذه الميزة تتطلب حساباً مسجلاً. سجل دخولك الآن أو أنشئ حساباً جديداً.</p>
+            <div class="login-required-buttons">
+                <button class="btn-cancel" id="loginRequiredCancel">إلغاء</button>
+                <button class="btn-login-now" id="loginRequiredLogin">تسجيل الدخول</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== الفوتر ========== -->
+    <footer class="footer" id="contactSection">
+        <div class="footer-content">
+            <div class="footer-logo">SYRELIS</div>
+            <div class="footer-copyright">&copy; 2025 جميع الحقوق محفوظة</div>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== جافا سكريبت (متكامل مع الباك) ========== -->
+    <script>
+        // ===== دوال المصادقة الحقيقية =====
+        async function isLoggedIn() {
+            const res = await fetch('/Account/IsLoggedIn');
+            const data = await res.json();
+            return data.isLoggedIn;
+        }
+
+        // ===== تسجيل الدخول =====
+        document.getElementById('loginBtn').addEventListener('click', async function () {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+            const res = await fetch('/Account/Login', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+
+        // ===== تسجيل الخروج =====
+        async function logout() {
+            await fetch('/Account/Logout', { method: 'POST' });
+            location.reload();
+        }
+
+        // ===== إنشاء حساب =====
+        document.getElementById('signupBtn').addEventListener('click', async function () {
+            const fullName = document.getElementById('signupFullName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const formData = new FormData();
+            formData.append('fullName', fullName);
+            formData.append('email', email);
+            formData.append('password', password);
+            const res = await fetch('/Account/Register', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+
+        // ===== تبديل واجهات المودال =====
+        const modal = document.getElementById('authModal');
+        const loginPanel = document.getElementById('loginPanel');
+        const signupPanel = document.getElementById('signupPanel');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+
+        document.getElementById('openModalBtn').addEventListener('click', () => modal.classList.add('active'));
+        document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.remove('active'));
+        document.getElementById('switchToSignupBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            loginPanel.style.display = 'none';
+            signupPanel.style.display = 'block';
+            modalTitle.textContent = 'إنشاء حساب جديد';
+            modalSubtitle.textContent = 'انضم إلى عائلة SYRELIS';
+        });
+        document.getElementById('switchToLoginBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            signupPanel.style.display = 'none';
+            loginPanel.style.display = 'block';
+            modalTitle.textContent = 'تسجيل الدخول';
+            modalSubtitle.textContent = 'أهلاً بك مجدداً';
+        });
+
+        // ===== مودال "يجب تسجيل الدخول" =====
+        const loginRequiredModal = document.getElementById('loginRequiredModal');
+        document.getElementById('loginRequiredCancel').addEventListener('click', () => loginRequiredModal.classList.remove('active'));
+        document.getElementById('loginRequiredLogin').addEventListener('click', () => {
+            loginRequiredModal.classList.remove('active');
+            modal.classList.add('active');
+        });
+
+        // ===== روابط "أعلن عن عقارك" و "حسابي" =====
+        document.getElementById('announceLink').addEventListener('click', async function (e) {
+            e.preventDefault();
+            if (await isLoggedIn()) {
+                window.location.href = '@Url.Action("AddProperty", "Property")';
+            } else {
+                loginRequiredModal.classList.add('active');
+            }
+        });
+
+        document.getElementById('myAccountLink').addEventListener('click', async function (e) {
+            e.preventDefault();
+            if (await isLoggedIn()) {
+                window.location.href = '@Url.Action("Profile", "Account")';
+            } else {
+                loginRequiredModal.classList.add('active');
+            }
+        });
+
+        // ===== دوال المفضلة الحقيقية =====
+        async function handleFavorite(propertyId, btn) {
+            if (!(await isLoggedIn())) {
+                loginRequiredModal.classList.add('active');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('propertyId', propertyId);
+            const res = await fetch('/Property/ToggleFavorite', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                if (data.added) {
+                    btn.classList.add('added');
+                    btn.querySelector('i').className = 'fas fa-heart';
+                    btn.querySelector('span').textContent = 'في المفضلة';
+                } else {
+                    btn.classList.remove('added');
+                    btn.querySelector('i').className = 'far fa-heart';
+                    btn.querySelector('span').textContent = 'أضف للمفضلة';
+                }
+            }
+        }
+
+        // تحميل حالة المفضلة عند كل صفحة
+        async function loadFavorites() {
+            if (!(await isLoggedIn())) return;
+            const res = await fetch('/Property/GetFavoritesStatus');
+            const ids = await res.json();
+            document.querySelectorAll('.btn-favorite').forEach(btn => {
+                const id = parseInt(btn.dataset.id);
+                if (ids.includes(id)) {
+                    btn.classList.add('added');
+                    btn.querySelector('i').className = 'fas fa-heart';
+                    btn.querySelector('span').textContent = 'في المفضلة';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFavorites);
+
+        // ===== دالة Toast =====
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:50%;left:50%;transform:translateX(-50%);background:#f3f8ff;color:#042347;padding:12px 28px;border-radius:40px;font-weight:800;z-index:999999;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+    </script>
+</body>
+</html>
